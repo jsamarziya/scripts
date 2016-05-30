@@ -1,0 +1,10 @@
+#!/bin/sh
+
+curdir=`pwd`
+for dir in "$@"; do
+    cd "$dir"
+    for packagedir in `find . -name "*.java"`; do dirname $packagedir; done|sort|uniq|cut -c3-|sed 's/\//\./g'|sed 's/$/ /'|tr -d '\n'
+    cd "$curdir"
+done
+
+

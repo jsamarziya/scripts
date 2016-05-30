@@ -1,0 +1,17 @@
+#!/bin/sh
+
+## Source: UNIX Power Tools 34.03
+##
+## Shows the changes that a sed script performs.
+##
+## This script expects to find the script file "sedscr" in the current
+## directory and applies these instructions to the input files named
+## on the command line.
+
+script=sedscr
+
+for file do
+    echo "****** < = $file > = sed output ******"
+    sed -f $script "$file" | diff "$file" -
+done | ${PAGER-more}
+

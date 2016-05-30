@@ -1,0 +1,7 @@
+#!/usr/bin/perl
+
+# Prints the size of a file or files (in bytes)
+
+foreach $filename (@ARGV) {
+    print STDOUT (stat $filename)[7], "\n";
+}

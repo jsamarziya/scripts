@@ -1,0 +1,9 @@
+#!/usr/bin/perl -w
+
+# sbg - silent backgrounder
+
+exit -1 if $#ARGV < 0;
+
+exec (@ARGV) if (!fork);
+
+exit 0;

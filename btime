@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# ring the bell if command execution takes longer than this many seconds:
+RING_AFTER=5
+
+START=`date +%s`
+
+eval "$@"
+
+END=`date +%s`
+
+if let "$END - $START >= $RING_AFTER" ; then 
+  echo -n -e \\a
+fi

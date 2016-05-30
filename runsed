@@ -1,0 +1,79 @@
+#!/bin/bash
+
+## runsed
+## Based on runsed script specification in UNIX Power Tools 34.03.
+##
+## Applies a sed script to an input file, creates a temporary file,
+## then copies that file over the original.
+## 
+## runsed will not edit the sed script file (if you accidentally
+## include the sed script on the command line)
+##
+## runsed will complain if you try to edit an empty file or something
+## that isn't a file (like a directory)
+##
+## If the sed script doesn't produce any output, runsed aborts instead
+## of emptying your original file.
+##
+## runsed only modifies a file if your sed script made edits.  So, the
+## file's timestamp won't change if the file's contents weren't
+## changed.
+##
+## Usage: runsed sed_script [file...]
+
+if [ $# -lt 2 ]; then 
+  echo "usage: runsed sed_script [file...]"
+  exit
+fi
+
+sedscr=$1
+shift;
+
+tmpfile="/tmp/runsed.$$.`date +'%d%m%y%H%M%S'`"
+
+for file do
+  if [ ! -e $file ]; then
+    echo "runsed: $file does not exist"
+    continue
+  fi
+
+  if [ -d $file ]; then
+    echo "runsed: $file is a directory, skipping"
+    continue
+  fi
+
+  if [ ! \( -f $file -o -f $file \) ]; then
+    echo "runsed: bad file $file, skipping"
+    continue
+  fi
+    
+  if [ ! -s $file ]; then
+    echo "runsed: empty file $file, skipping"
+    continue 
+  fi
+
+  if [ $file -ef $sedscr ]; then
+    echo "runsed: skipping sed script $file"
+    continue
+  fi
+
+  echo "runsed: editing $file:"
+
+  rm -f $tmpfile
+  sed -f $sedscr $file > $tmpfile
+
+  if [ ! -s $tmpfile ]; then
+    echo "runsed: empty result file, skipping"
+    rm -f $tmpfile
+    continue
+  fi
+
+  if diff $file $tmpfile; then
+    echo "runsed: no changes, skipping"
+    rm -f $tmpfile
+    continue
+  fi
+  
+  cp $tmpfile $file
+  rm -f $tmpfile
+done
